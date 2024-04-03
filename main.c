@@ -3,13 +3,12 @@
 #include <unistd.h>
 #include <math.h>
 
-int border_width = 40;
-int border_height = 40;
+#define HIDE_CURSOR() printf("\e[?25l")
+#define SHOW_CURSOR() printf("\e[?25h")
+#define MOVE_CURSOR() printf("\e[1;1H")
 
-// int n = 4;
-// double xpos[] = {10, 10, -10, -10};
-// double ypos[] = {5, -5, 5, -5};
-
+int border_width = 80;
+int border_height = 45;
 
 void rotate(double theta, double *x, double *y) {
   double theta_rad = theta * 3.14 / 180;
@@ -32,8 +31,8 @@ void draw(int n, double xpos[], double ypos[])
       int do_draw = 0;
       for (int k = 0; k < n; k++)
       {
-        double x = round(xpos[k] + 15);
-        double y = round(ypos[k] + 15);
+        double x = round(xpos[k] + 50);
+        double y = round(ypos[k] + 20);
         if ((abs((double)i - y) < 1) && (abs((double)j - x) < 1))
         {
           do_draw = 1;
@@ -53,29 +52,32 @@ void draw(int n, double xpos[], double ypos[])
 
 int main()
 {
-  // big X
-  // int n = 20;
-  // double xpos[] = { 1, 1, -1, -1, 2, 2, -2, -2, 3, 3, -3, -3, 4, 4, -4, -4, 5, 5, -5, -5};
-  // double ypos[] = { 1, -1, 1, -1, 2, -2, 2, -2, 3, -3, 3, -3, 4, -4, 4, -4, 5, -5, 5, -5};
+  HIDE_CURSOR();
 
   // square
-  int n = 38;
-  // int n = 20;
+
+  int square_height = 20;
+  int square_width = 20;
+
+  // int n = 56;
+  int n = (2 * square_height) + (2 * square_width) - 4;
   double xpos[n];
   double ypos[n];
+  
   int idx = 0;
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < square_height; i++)
   {
-    for (int j = 0; j < 10; j++)
+    for (int j = 0; j < square_width; j++)
     {
       // top/bottom
-      if (i == 0 || i == 10 - 1)
+      if (i == 0 || i == square_height - 1)
       {
         xpos[idx] = j;
         ypos[idx] = i;
         idx++;
       }
-      else if (j == 0 || j == 10 - 1)
+      // left/right
+      else if (j == 0 || j == square_width - 1)
       {
         xpos[idx] = j;
         ypos[idx] = i;
@@ -83,16 +85,11 @@ int main()
       }
     }
   }
-
-  // int n = 5;
-  // double xpos[] = {0, 2, 0, -2, 0};
-  // double ypos[] = {0, 0, 2, 0, -2};
-
-  for (int i = 0; i < 6; i++)
-  {}
+  printf("%d", idx);
 
   while (1)
   {
+    // MOVE_CURSOR();
     system("clear");
     draw(n, xpos, ypos);
     
@@ -104,6 +101,8 @@ int main()
     double wait_s = 0.05;
     usleep(wait_s * 1000000);
   }
+
+  SHOW_CURSOR();
 
   return 0;
 }
