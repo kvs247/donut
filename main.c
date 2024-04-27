@@ -50,6 +50,67 @@ void draw(int n, unsigned short wheight, unsigned int wwidth, double xpos[], dou
   }
 }
 
+void make_square_border(int *n, double **xpos, double **ypos)
+{
+  int square_height = 20;
+  int square_width = 30;
+
+  int i_range = square_height / 2;
+  int j_range = square_width / 2;
+
+  *n = (2 * square_height) + (2 * square_width) - 4;
+
+  *xpos = (double *)malloc((*n) * sizeof(double));
+  *ypos = (double *)malloc((*n) * sizeof(double));
+
+  int idx = 0;
+  for (int i = -i_range; i < i_range; i++)
+  {
+    for (int j = -j_range; j < j_range; j++)
+    {
+      // top/bottom
+      if (i == -i_range || i == i_range - 1)
+      {
+        (*xpos)[idx] = j;
+        (*ypos)[idx] = i;
+        idx++;
+      }
+      // left/right
+      else if (j == -j_range || j == j_range - 1)
+      {
+        (*xpos)[idx] = j;
+        (*ypos)[idx] = i;
+        idx++;
+      }
+    }
+  }
+}
+
+void make_square(int *n, double **xpos, double **ypos)
+{
+  int square_height = 20;
+  int square_width = 20;
+
+  int i_range = square_height / 2;
+  int j_range = square_width / 2;
+
+  *n = square_height * square_width;
+
+  *xpos = (double *)malloc((*n) * sizeof(double));
+  *ypos = (double *)malloc((*n) * sizeof(double));
+
+  int idx = 0;
+  for (int i = -i_range; i < i_range; i++)
+  {
+    for (int j = -j_range; j < j_range; j++)
+    {
+      (*xpos)[idx] = j;
+      (*ypos)[idx] = i;
+      idx++;
+    }
+  }
+}
+
 int main()
 {
   struct winsize ws;
@@ -62,40 +123,11 @@ int main()
 
   HIDE_CURSOR();
 
-  // square
+  int n;
+  double *xpos, *ypos;
 
-  int square_height = 20;
-  int square_width = 20;
-
-  int n = (2 * square_height) + (2 * square_width) - 4;
-  double xpos[n];
-  double ypos[n];
-
-  int i_range = square_height / 2;
-  int j_range = square_width / 2;
-
-  int idx = 0;
-  for (int i = -i_range; i < i_range; i++)
-  {
-    for (int j = -j_range; j < j_range; j++)
-    {
-      // top/bottom
-      if (i == -i_range || i == i_range - 1)
-      {
-        xpos[idx] = j;
-        ypos[idx] = i;
-        idx++;
-      }
-      // left/right
-      else if (j == -j_range || j == j_range - 1)
-      {
-        xpos[idx] = j;
-        ypos[idx] = i;
-        idx++;
-      }
-    }
-  }
-  printf("%d", idx);
+  // make_square_border(&n, &xpos, &ypos);
+  make_square(&n, &xpos, &ypos);
 
   while (1)
   {
@@ -110,6 +142,7 @@ int main()
     }
 
     double wait_s = 0.05;
+    // double wait_s = 1;
     usleep(wait_s * 1000000);
   }
 
