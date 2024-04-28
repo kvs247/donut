@@ -11,6 +11,27 @@
 int border_width = 80;
 int border_height = 45;
 
+void get_arr_min_max(double *min, double *max, int n, double *arr)
+{
+  *min = arr[0];
+  *max = arr[0];
+
+  for (int i = 0; i < n; i++)
+  {
+    double ele = arr[i];
+
+    if (ele < *min)
+    {
+      *min = ele;
+    }
+
+    if (ele > *max)
+    {
+      *max = ele;
+    }
+  }
+}
+
 void rotate(double theta, double *x, double *y)
 {
   double theta_rad = theta * 3.14 / 180;
@@ -22,8 +43,47 @@ void rotate(double theta, double *x, double *y)
   *y = new_y;
 };
 
+// for Ubuntu use the Noto Color Emoji terminal font for a grid-like layout
 void draw(int n, unsigned short wheight, unsigned int wwidth, double xpos[], double ypos[])
 {
+  for (int i = 0; i < wheight - 1; i++)
+  {
+    for (int j = 0; j < wwidth - 1; j++)
+    {
+      int do_draw = 0;
+      for (int k = 0; k < n; k++)
+      {
+        double x = round(xpos[k] + (wwidth / 2));
+        double y = round(ypos[k] + (wheight / 2));
+        if ((abs((double)i - y) < 1) && (abs((double)j - x) < 1))
+        {
+          do_draw = 1;
+          printf("*");
+          break; // need this?
+        }
+      }
+
+      if (!do_draw)
+      {
+        printf(" ");
+      }
+    }
+    printf("\n");
+  }
+}
+
+void draw2(int n, unsigned short wheight, unsigned int wwidth, double xpos[], double ypos[])
+{
+  double xmin;
+  double xmax;
+  double ymin;
+  double ymax;
+
+  get_arr_min_max(&xmin, &xmax, n, xpos);
+  get_arr_min_max(&ymin, &ymax, n, ypos);
+
+  // printf("%f_%f_%f_%f", xmin, xmax,ymin, ymax);
+
   for (int i = 0; i < wheight - 1; i++)
   {
     for (int j = 0; j < wwidth - 1; j++)
@@ -111,6 +171,24 @@ void make_square(int *n, double **xpos, double **ypos)
   }
 }
 
+void make_corners(int *n, double **xpos, double **ypos)
+{
+  *n = 4;
+
+  *xpos = (double *)malloc((*n) * sizeof(double));
+  *ypos = (double *)malloc((*n) * sizeof(double));
+
+  (*xpos)[0] = 10.0;
+  (*xpos)[1] = 10.0;
+  (*xpos)[2] = -10.0;
+  (*xpos)[3] = -10.0;
+
+  (*ypos)[0] = 10.0;
+  (*ypos)[1] = -10.0;
+  (*ypos)[2] = 10.0;
+  (*ypos)[3] = -10.0;
+}
+
 int main()
 {
   struct winsize ws;
@@ -127,13 +205,14 @@ int main()
   double *xpos, *ypos;
 
   // make_square_border(&n, &xpos, &ypos);
-  make_square(&n, &xpos, &ypos);
+  // make_square(&n, &xpos, &ypos);
+  make_corners(&n, &xpos, &ypos);
 
   while (1)
   {
     MOVE_CURSOR();
     system("clear");
-    draw(n, ws.ws_row, ws.ws_col, xpos, ypos);
+    draw2(n, ws.ws_row, ws.ws_col, xpos, ypos);
 
     for (int k = 0; k < n; k++)
     {
