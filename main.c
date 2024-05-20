@@ -8,10 +8,7 @@
 #define SHOW_CURSOR() printf("\e[?25h")
 #define MOVE_CURSOR() printf("\e[1;1H")
 
-int border_width = 80;
-int border_height = 45;
-
-void get_arr_min_max(double *min, double *max, int n, double *arr)
+void getArrMinMax(double *min, double *max, int n, double *arr)
 {
   *min = arr[0];
   *max = arr[0];
@@ -34,125 +31,92 @@ void get_arr_min_max(double *min, double *max, int n, double *arr)
 
 void rotate(double theta, double *x, double *y)
 {
-  double theta_rad = theta * 3.14 / 180;
+  double thetaRad = theta * 3.14 / 180;
 
-  double new_x = (*x * cos(theta_rad)) - (*y * sin(theta_rad));
-  double new_y = (*x * sin(theta_rad)) + (*y * cos(theta_rad));
+  double xnew = (*x * cos(thetaRad)) - (*y * sin(thetaRad));
+  double ynew = (*x * sin(thetaRad)) + (*y * cos(thetaRad));
 
-  *x = new_x;
-  *y = new_y;
+  *x = xnew;
+  *y = ynew;
 };
 
 // for Ubuntu use the Noto Color Emoji terminal font for a grid-like layout
-void draw(int n, unsigned short wheight, unsigned int wwidth, double xpos[], double ypos[])
-{
-  for (int i = 0; i < wheight - 1; i++)
-  {
-    for (int j = 0; j < wwidth - 1; j++)
-    {
-      int do_draw = 0;
-      for (int k = 0; k < n; k++)
-      {
-        double x = round(xpos[k] + (wwidth / 2));
-        double y = round(ypos[k] + (wheight / 2));
-        if ((abs((double)i - y) < 1) && (abs((double)j - x) < 1))
-        {
-          do_draw = 1;
-          printf("*");
-          break; // need this?
-        }
-      }
-
-      if (!do_draw)
-      {
-        printf(" ");
-      }
-    }
-    printf("\n");
-  }
-}
-
-void draw2(int n, unsigned short wheight, unsigned int wwidth, double xpos[], double ypos[])
+void draw(
+    int n,
+    unsigned short winowHeight,
+    unsigned int windowWidth,
+    double xPoints[],
+    double yPoints[])
 {
   double xmin;
   double xmax;
   double ymin;
   double ymax;
 
-  get_arr_min_max(&xmin, &xmax, n, xpos);
-  get_arr_min_max(&ymin, &ymax, n, ypos);
+  getArrMinMax(&xmin, &xmax, n, xPoints);
+  getArrMinMax(&ymin, &ymax, n, yPoints);
 
-  double point0_x = xpos[0];
-  double point0_y = ypos[0];
+  double xPoint0 = xPoints[0];
+  double yPoint0 = yPoints[0];
 
-  double point1_x = xpos[1];
-  double point1_y = ypos[1];
+  double xPoint1 = xPoints[1];
+  double yPoint1 = yPoints[1];
 
-  double point2_x = xpos[2];
-  double point2_y = ypos[2];
+  double xPoint2 = xPoints[2];
+  double yPoint2 = yPoints[2];
 
-  double point3_x = xpos[3];
-  double point3_y = ypos[3];
+  double xPoint3 = xPoints[3];
+  double yPoint3 = yPoints[3];
 
-  double slope01 = (point1_y - point0_y) / (point1_x - point0_x);
-  double slope12 = (point2_y - point1_y) / (point2_x - point1_x);
-  double slope23 = (point3_y - point2_y) / (point3_x - point2_x);
-  double slope30 = (point0_y - point3_y) / (point0_x - point3_x);
+  double slope01 = (yPoint1 - yPoint0) / (xPoint1 - xPoint0);
+  double slope12 = (yPoint2 - yPoint1) / (xPoint2 - xPoint1);
+  double slope23 = (yPoint3 - yPoint2) / (xPoint3 - xPoint2);
+  double slope30 = (yPoint0 - yPoint3) / (xPoint0 - xPoint3);
 
-  int is_side_01_top = 0;
-  if (point0_y == ymax || point1_y == ymax)
+  int isSide01Top = 0;
+  if (yPoint0 == ymax || yPoint1 == ymax)
   {
-    is_side_01_top = 1;
+    isSide01Top = 1;
   }
 
-  int is_side_12_top = 0;
-  if (point1_y == ymax || point3_y == ymax)
+  int isSide12Top = 0;
+  if (yPoint1 == ymax || yPoint3 == ymax)
   {
-    is_side_12_top = 1;
+    isSide12Top = 1;
   }
 
-  for (int i = 0; i < wheight - 1; i++)
+  for (int y = 0; y < winowHeight - 1; y++)
   {
-    for (int j = 0; j < wwidth - 1; j++)
+    for (int x = 0; x < windowWidth - 1; x++)
     {
-      int do_draw = 0;
+      double xOffset = windowWidth / 2;
+      double yOffset = winowHeight / 2;
 
-      double xoffset = wwidth / 2;
-      double yoffset = wheight / 2;
+      double side01 = (slope01 * (x - (xPoint0 + xOffset))) + (yPoint0 + yOffset);
+      double side23 = (slope23 * (x - (xPoint2 + xOffset))) + (yPoint2 + yOffset);
 
-      double x = j;
-      double y = i;
-
-      double side_01 = (slope01 * (x - (point0_x + xoffset))) + (point0_y + yoffset);
-      double side_23 = (slope23 * (x - (point2_x + xoffset))) + (point2_y + yoffset);
-      
-      double side_12 = (slope12 * (x - (point1_x + xoffset))) + (point1_y + yoffset);
-      double side_30 = (slope30 * (x - (point3_x + xoffset))) + (point3_y + yoffset);
+      double side12 = (slope12 * (x - (xPoint1 + xOffset))) + (yPoint1 + yOffset);
+      double side30 = (slope30 * (x - (xPoint3 + xOffset))) + (yPoint3 + yOffset);
 
       int condition = 0;
-      if (is_side_01_top && is_side_12_top)
+      if (isSide01Top && isSide12Top)
       {
-        condition = y <= side_01 && y >= side_23 && y <= side_12 && y >= side_30;
+        condition = y <= side01 && y >= side23 && y <= side12 && y >= side30;
       }
-      else if (is_side_01_top && !is_side_12_top)
+      else if (isSide01Top && !isSide12Top)
       {
-        condition = y <= side_01 && y >= side_23 && y >= side_12 && y <= side_30;
+        condition = y <= side01 && y >= side23 && y >= side12 && y <= side30;
       }
-      else if (!is_side_01_top && is_side_12_top)
+      else if (!isSide01Top && isSide12Top)
       {
-        condition = y >= side_01 && y <= side_23 && y >= side_12 && y <= side_30;
+        condition = y >= side01 && y <= side23 && y >= side12 && y <= side30;
       }
       else
       {
-        condition = y >= side_01 && y <= side_23 && y <= side_12 && y >= side_30;
+        condition = y >= side01 && y <= side23 && y <= side12 && y >= side30;
       }
 
       if (condition)
-      {
-        do_draw = 1;
-      }
-
-      if (do_draw)
       {
         printf("*");
       }
@@ -162,70 +126,6 @@ void draw2(int n, unsigned short wheight, unsigned int wwidth, double xpos[], do
       }
     }
     printf("\n");
-  }
-  printf(is_side_12_top ? "right\n" : "left\n");
-  printf(is_side_01_top ? "top\n" : "bot\n");
-  printf("\n%f (%f, %f) (%f, %f) (%f, %f) (%f, %f)\n", ymax, point0_x, point0_y, point1_x, point1_y, point2_x, point2_y, point3_x, point3_y);
-}
-
-void make_square_border(int *n, double **xpos, double **ypos)
-{
-  int square_height = 20;
-  int square_width = 30;
-
-  int i_range = square_height / 2;
-  int j_range = square_width / 2;
-
-  *n = (2 * square_height) + (2 * square_width) - 4;
-
-  *xpos = (double *)malloc((*n) * sizeof(double));
-  *ypos = (double *)malloc((*n) * sizeof(double));
-
-  int idx = 0;
-  for (int i = -i_range; i < i_range; i++)
-  {
-    for (int j = -j_range; j < j_range; j++)
-    {
-      // top/bottom
-      if (i == -i_range || i == i_range - 1)
-      {
-        (*xpos)[idx] = j;
-        (*ypos)[idx] = i;
-        idx++;
-      }
-      // left/right
-      else if (j == -j_range || j == j_range - 1)
-      {
-        (*xpos)[idx] = j;
-        (*ypos)[idx] = i;
-        idx++;
-      }
-    }
-  }
-}
-
-void make_square(int *n, double **xpos, double **ypos)
-{
-  int square_height = 20;
-  int square_width = 20;
-
-  int i_range = square_height / 2;
-  int j_range = square_width / 2;
-
-  *n = square_height * square_width;
-
-  *xpos = (double *)malloc((*n) * sizeof(double));
-  *ypos = (double *)malloc((*n) * sizeof(double));
-
-  int idx = 0;
-  for (int i = -i_range; i < i_range; i++)
-  {
-    for (int j = -j_range; j < j_range; j++)
-    {
-      (*xpos)[idx] = j;
-      (*ypos)[idx] = i;
-      idx++;
-    }
   }
 }
 
@@ -249,9 +149,9 @@ void make_corners(int *n, double **xpos, double **ypos)
 
 int main()
 {
-  struct winsize ws;
+  struct winsize windowSize;
 
-  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1)
+  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &windowSize) == -1)
   {
     perror("ioctl");
     return 1;
@@ -260,26 +160,23 @@ int main()
   HIDE_CURSOR();
 
   int n;
-  double *xpos, *ypos;
+  double *xPoints, *yPoints;
 
-  // make_square_border(&n, &xpos, &ypos);
-  // make_square(&n, &xpos, &ypos);
-  make_corners(&n, &xpos, &ypos);
+  make_corners(&n, &xPoints, &yPoints);
 
   while (1)
   {
     MOVE_CURSOR();
     system("clear");
-    draw2(n, ws.ws_row, ws.ws_col, xpos, ypos);
+    draw(n, windowSize.ws_row, windowSize.ws_col, xPoints, yPoints);
 
     for (int k = 0; k < n; k++)
     {
       int r = 10;
-      rotate(r, &xpos[k], &ypos[k]);
+      rotate(r, &xPoints[k], &yPoints[k]);
     }
 
     double wait_s = 0.05;
-    // double wait_s = 0.2;
     usleep(wait_s * 1000000);
   }
 
