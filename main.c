@@ -140,11 +140,11 @@ void draw2(int n, unsigned short wheight, unsigned int wwidth, double xpos[], do
       }
       else if (!is_side_01_top && is_side_12_top)
       {
-        condition = y >= side_01 && y <= side_23 && y <= side_12 && y >= side_30;
+        condition = y >= side_01 && y <= side_23 && y >= side_12 && y <= side_30;
       }
       else
       {
-        condition = y >= side_01 && y <= side_23 && y >= side_12 && y <= side_30;
+        condition = y >= side_01 && y <= side_23 && y <= side_12 && y >= side_30;
       }
 
       if (condition)
@@ -278,8 +278,8 @@ int main()
       rotate(r, &xpos[k], &ypos[k]);
     }
 
-    // double wait_s = 0.05;
-    double wait_s = 0.2;
+    double wait_s = 0.05;
+    // double wait_s = 0.2;
     usleep(wait_s * 1000000);
   }
 
